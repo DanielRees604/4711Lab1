@@ -18,7 +18,7 @@ and open the template in the editor.
             function __construct($squares){
                 $this->position = str_split($squares);
             }
-            
+            //Checks if x or o has won the game.
             function winner($token){
                 $won = false;
                 for($row=0; $row<3; $row++) {
@@ -54,6 +54,7 @@ and open the template in the editor.
                 }
                 return $won;
             }
+            //displays the tic tac toe board with proper x's o's and empty spaces
             function display(){
                 echo '<table cols="3" style="font-size:large; font-weight:bold" border="1">';
                 echo '<tr>'; // open 
@@ -68,13 +69,15 @@ and open the template in the editor.
                 $token = $this->position[$which];
                 //deal with the easy case
                 if($token <> '-') return '<td>'.$token.'</td>';
-                //hard case
-                $this->newposition = $this->position;
-                $this->newposition[$which] = 'x';
-                $move = implode($this->newposition);
-                $link = '?board='.$move;
+                //now the hard cases.
+                $this->newposition = $this->position;//copy the original
+                $this->newposition[$which] = 'x';//this would be their move.
+                $move = implode($this->newposition);//make a string from the board array.
+                $link = '?board='.$move;//this is what we want the link to be
+                // so return a cell containing an anchor and showing a hyphen
                 return '<td><a href="'.$link.'" style="text-decoration: none">-</a></td>'; 
             }
+            //the "ai" picks a empty space on the board.
             function pick_move(){
                 $emptySpaces = array();
                 for ($pos = 0; $pos<9;$pos++){
@@ -85,26 +88,21 @@ and open the template in the editor.
                 $randomNumber = rand(0, count($emptySpaces) -1);
                 $this->position[$emptySpaces[$randomNumber]] = 'o';
             }
-            function check_board(){
-                $empty = true;
-                for ($pos = 0; $pos<9;$pos++){
-                    if($this->position[$pos] <> '-'){
-                        $empty = false;
-                    }
-                }
-                return $empty;
-            }
         }
+        /*
+         * variable to check if a winner has been
+         * decided so the "ai" doesnt play another turn.
+         */
         $over = false;
         
         if (isset($_GET['board']))
             $game = new Game($_GET['board']);
         else
             $game = new Game("---------");
-                if($over == false){
+        if($over == false){
             $game->pick_move();       
         }
-        
+        //calls the winner function and display who won, or if no winner yet.
         if ($game->winner('x')){
             echo 'X Wins.';
             $over = true;
@@ -116,6 +114,7 @@ and open the template in the editor.
         }
 
         $game->display();
+        //for reseting the board
         $link = "?board=---------";
         echo '<br/><a href="'.$link.'">Reset</a>';
         ?>
