@@ -21,6 +21,7 @@ and open the template in the editor.
             //Checks if x or o has won the game.
             function winner($token){
                 $won = false;
+                //checks rows
                 for($row=0; $row<3; $row++) {
                     $result = true;
                     for($col=0; $col<3; $col++){
@@ -32,6 +33,7 @@ and open the template in the editor.
                         $won = true;
                     }
                 }
+                //checks col's
                 for($col=0; $col<3; $col++) {
                     $result = true;
                     for($row=0; $row<3; $row++){
@@ -43,6 +45,7 @@ and open the template in the editor.
                         $won = true;
                     }
                 }
+                //checks the X win
                 if (($this->position[0] == $token) &&
                     ($this->position[4] == $token) &&
                     ($this->position[8] == $token)) {
@@ -68,7 +71,7 @@ and open the template in the editor.
             function show_cell($which){
                 $token = $this->position[$which];
                 //deal with the easy case
-                if($token <> '-') return '<td>'.$token.'</td>';
+                if($token <> '-' || $this->winner('x') || $this->winner('o')) return '<td>'.$token.'</td>';
                 //now the hard cases.
                 $this->newposition = $this->position;//copy the original
                 $this->newposition[$which] = 'x';//this would be their move.
@@ -88,20 +91,12 @@ and open the template in the editor.
                 $randomNumber = rand(0, count($emptySpaces) -1);
                 $this->position[$emptySpaces[$randomNumber]] = 'o';
             }
-        }
-        /*
-         * variable to check if a winner has been
-         * decided so the "ai" doesnt play another turn.
-         */
-        $over = false;
-        
+        }        
         if (isset($_GET['board']))
             $game = new Game($_GET['board']);
         else
             $game = new Game("---------");
-        if($over == false){
-            $game->pick_move();       
-        }
+             
         //calls the winner function and display who won, or if no winner yet.
         if ($game->winner('x')){
             echo 'X Wins.';
@@ -110,9 +105,15 @@ and open the template in the editor.
             echo 'O Wins.';
             $over = true;
         }else{
-            echo 'No winner';
+            $game->pick_move();
+            if ($game->winner('x')){
+                echo 'X Wins.';
+            }else if ($game->winner('o')){
+                echo 'O Wins.';
+            }else{
+                echo 'No winner';
+            }
         }
-
         $game->display();
         //for reseting the board
         $link = "?board=---------";
